@@ -4,6 +4,8 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { LoggerInterceptor } from 'src/common/interceptors/logger.interceptors';
+import { BodyCreateTaskInterceptor } from 'src/common/interceptors/body-create-task.interceptor';
+import { AddHeaderInterceptor } from 'src/common/interceptors/add-header.interceptor';
 
 @Controller('tasks')
 
@@ -13,6 +15,7 @@ export class TasksController {
 
     @Get()
     @UseInterceptors(LoggerInterceptor)
+    @UseInterceptors(AddHeaderInterceptor)
     findAll(@Query() paginationDto: PaginationDto) {        
         return this.taskService.findAll(paginationDto);
     }
@@ -20,6 +23,7 @@ export class TasksController {
     findOne(@Param('id', ParseIntPipe) id : number) {
         return this.taskService.findOne(id);
     }
+    @UseInterceptors(BodyCreateTaskInterceptor)
     @Post()
     createTask(@Body() CreateTaskDto : CreateTaskDto) {
         return this.taskService.create(CreateTaskDto);
