@@ -32,14 +32,23 @@ export class TasksService {
     );
   }
   async create(CreateTaskDto: CreateTaskDto) {
-    const newTask = await this.prisma.task.create({
-      data: {
-        name: CreateTaskDto.name,
-        description: CreateTaskDto.description,
-        Completed: false,
-      },
-    });
-    return newTask;
+    try {
+      const newTask = await this.prisma.task.create({
+        data: {
+          name: CreateTaskDto.name,
+          description: CreateTaskDto.description,
+          Completed: false,
+          userId: CreateTaskDto.userId,
+        },
+      });
+      return newTask;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        `Error creating task: ${error.message}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async update(id: number, UpdateTaskDto: UpdateTaskDto) {
@@ -55,7 +64,11 @@ export class TasksService {
 
     const updatedTask = await this.prisma.task.update({
       where: { id: id },
-      data: UpdateTaskDto,
+      data: {
+        name: UpdateTaskDto?.name ? UpdateTaskDto?.name : findTask.name,
+        description: UpdateTaskDto?.description ? UpdateTaskDto?.description : findTask.description,
+        Completed: UpdateTaskDto?.Completed ? UpdateTaskDto?.Completed : findTask.Completed,
+      },
     });
 
     return updatedTask;
