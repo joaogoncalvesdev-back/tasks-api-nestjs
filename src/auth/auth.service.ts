@@ -38,19 +38,21 @@ export class AuthService {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
 
+    const payload = { sub: user.id, email: user.email };
+
     const token = await this.jwtService.signAsync(
-      {
-        sub: user.id,
-        email: user.email,
-      },
-      {
+     payload,{
         secret: this.jwtConfiguration.secret,
         expiresIn: this.jwtConfiguration.jwtTtl,
         audience: this.jwtConfiguration.audience,
-        issuer: this.jwtConfiguration.issuer,
-      },
-    );
+        issuer: this.jwtConfiguration.issuer
+      }
+    )
 
-    return { message: 'Authentication successful' };
+    return{
+      access_token: token
+    }
+
+
   }
 }
